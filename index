@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>오늘의 포춘쿠키</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      /* 부드러운 그라데이션 */
+      background: linear-gradient(135deg, #ffe7c2, #ffc48a, #ffb06a);
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 580px;
+      padding: 24px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 34px 26px 30px;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.16);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .badge {
+      position: absolute;
+      top: 14px;
+      left: 20px;
+      font-size: 13px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #fff4db;
+      color: #c27b1b;
+      font-weight: 600;
+    }
+
+    .cookie {
+      font-size: 72px;
+      margin-top: 14px;
+      margin-bottom: 8px;
+      transition: transform 0.2s ease;
+    }
+
+    h1 {
+      font-size: 27px;
+      margin-bottom: 6px;
+      font-weight: 800;
+      color: #ff8a23;
+    }
+
+    .sub {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .date {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 18px;
+    }
+
+    /* 운세 박스 크게 */
+    .fortune-box {
+      background: #fff8ec;
+      border-radius: 18px;
+      padding: 30px 22px;
+      border: 1px dashed #ffb25a;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fortune-text {
+      font-size: 20px;
+      color: #333;
+      line-height: 1.8;
+      word-break: keep-all;
+      z-index: 1;
+      font-weight: 500;
+    }
+
+    /* 가림막 */
+    .fortune-cover {
+      position: absolute;
+      inset: 0;
+      background: #fff8ec;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .fortune-cover-inner {
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: #ffe4c2;
+      color: #c66a10;
+      font-size: 15px;
+      line-height: 1.6;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .fortune-cover.hide {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.12s;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, #ff9c3c, #ff7b24);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255,114,32,0.55);
+    }
+
+    .btn-sub {
+      background: #f4f4f4;
+      color: #444;
+    }
+
+    .btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #aaaaaa;
+    }
+
+    .brand {
+      font-weight: 700;
+      color: #ff8a23;
+    }
+
+    /* 쿠키 깨짐 애니메이션 */
+    @keyframes cookieCrack {
+      0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+      20%  { transform: scale(1.15) rotate(4deg); }
+      40%  { transform: scale(1.05) rotate(-4deg); }
+      60%  { transform: scale(1.2) rotate(2deg); }
+      80%  { transform: scale(0.9) rotate(-2deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    .cookie-crack {
+      animation: cookieCrack 0.55s ease;
+    }
+
+    @media (max-width: 400px) {
+      .card {
+        padding: 30px 18px 26px;
+      }
+      .fortune-text {
+        font-size: 18px;
+      }
+      .fortune-box {
+        min-height: 135px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="card">
+      <div class="badge">오늘만 열리는 한 마디</div>
+
+      <div class="cookie" id="cookieIcon">🥠</div>
+
+      <h1>오늘의 포춘쿠키</h1>
+
+      <p class="sub">
+        키링을 찍어준 당신에게 도착한<br />
+        작은 응원 한 조각
+      </p>
+
+      <div class="date" id="dateText"></div>
+
+      <div class="fortune-box">
+        <div class="fortune-text" id="fortuneText"></div>
+
+        <div class="fortune-cover" id="fortuneCover">
+          <div class="fortune-cover-inner">
+            포춘쿠키를 열면<br>오늘의 메시지가 나타납니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn btn-main" id="openBtn" onclick="openCookie()">🔓 포춘쿠키 열기</button>
+        <button class="btn btn-sub" id="shuffleBtn" onclick="shuffleFortune()" disabled>🔁 한 번 더 뽑기</button>
+      </div>
+
+      <div class="footer">
+        오늘도 <span class="brand">하이텍 포춘</span>이 응원합니다. ✨
+      </div>
+    </div>
+  </div>
+
+  <!-- 사운드 -->
+  <audio id="crackSound" src="cookie-crack.mp3" preload="auto"></audio>
+
+  <script>
+    /* 날짜 표시 */
+    function setToday() {
+      const dateEl = document.getElementById("dateText");
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = (now.getMonth()+1).toString().padStart(2,"0");
+      const d = now.getDate().toString().padStart(2,"0");
+      const w = ["일","월","화","수","목","금","토"][now.getDay()];
+      dateEl.textContent = `${y}년 ${m}월 ${d}일 (${w})`;
+    }
+
+    /* ====== 3,375개 조합 랜덤 운세 ====== */
+
+    const openings = [
+      "오늘은 생각보다 네 편인 날.",
+      "조용하지만 흐름이 좋은 날.",
+      "마음먹은 대로 길이 트이는 날.",
+      "생각보다 주변 사람이 많이 도와주는 날.",
+      "기대하지 않았던 순간에서 웃을 일이 생기는 날.",
+      "기분 전환하기에 딱 좋은 날.",
+      "새로운 시작을 꺼내보기에 괜찮은 날.",
+      "지금까지의 수고를 스스로 안아줘야 하는 날.",
+      "네가 가진 장점이 더 잘 보이는 날.",
+      "작은 선택 하나가 분위기를 바꾸는 날.",
+      "포기했던 걸 다시 꺼내봐도 좋은 날.",
+      "평소보다 감이 잘 살아나는 날.",
+      "마음이 유난히 예민하면서도 섬세해지는 날.",
+      "생각보다 나쁘지 않네, 싶은 날.",
+      "네가 생각하는 것보다 훨씬 잘 버티고 있는 날."
+    ];
+
+    const middles = [
+      "조급해하지 말고 네 템포를 지키면 좋겠음.",
+      "눈에 안 띄는 노력들이 서서히 모이고 있음.",
+      "비교하는 순간 힘이 빠지니, 오늘만큼은 네 페이스로 가보기.",
+      "괜히 불안하면 잠깐 숨 고르고 다시 출발해도 괜찮음.",
+      "완벽하지 않아도 이미 충분히 의미 있는 하루가 될 수 있음.",
+      "애매한 기분이 들면, 잠깐 산책이나 물 한 잔으로 리셋해보기.",
+      "작은 실수에 너무 오래 매달리지 말기.",
+      "네가 모르는 사이 누군가는 너를 꽤 괜찮다고 생각하고 있음.",
+      "대단한 계획보다, 오늘 한 가지를 끝내는 게 더 힘이 됨.",
+      "힘들었다면 인정하고, 잠깐 기대도 괜찮음.",
+      "오늘 느낀 생각과 감정은 분명 다음 선택에 도움이 될 거임.",
+      "괜히 불편한 사람이 있다면 거리를 조금 두어도 됨.",
+      "네가 했던 선택을 스스로 믿어주는 게 지금 가장 중요함.",
+      "하고 싶은 말이 있다면, 오늘은 조금 더 부드럽게 꺼내보자.",
+      "애써 괜찮은 척 안 해도 괜찮은 날이기도 함."
+    ];
+
+    const endings = [
+      "너는 이미 충분히 잘하고 있으니까.",
+      "조금 천천히 가도 결국 도착하게 되어 있으니까.",
+      "네가 쌓아둔 시간은 절대 헛되지 않을 거라서.",
+      "지금의 고민도 언젠가는 추억으로 웃으며 말하게 될 거라서.",
+      "오늘 하루만큼은 스스로를 좀 더 편하게 대해주길.",
+      "너를 응원하는 마음들이 생각보다 훨씬 많다는 걸 잊지 말길.",
+      "지금 이 순간도 분명 네 성장에 포함되어 있으니까.",
+      "내일의 너는 오늘의 너에게 분명 고마워할 거라서.",
+      "조금만 더 가면 ‘그래도 해보길 잘했다’라는 말이 나올 거니까.",
+      "너는 생각보다 단단하고, 생각보다 따뜻한 사람이라서.",
+      "이 정도면 진짜 잘 버티고 있는 거니까, 스스로 칭찬해주길.",
+      "오늘 느끼는 이 묘한 감정도 언젠가 네 색깔이 되어줄 거라서.",
+      "너 하나만큼은, 오늘만은 네 편이 되어주면 좋겠어서.",
+      "어느 방향으로 가든 결국 너답게 도착하게 되어 있으니까.",
+      "오늘도 네 하루가 너무 과하게 힘들지 않기를 바라면서."
+    ];
+
+    function getRandomFortune() {
+      const o = openings[Math.floor(Math.random() * openings.length)];
+      const m = middles[Math.floor(Math.random() * middles.length)];
+      const e = endings[Math.floor(Math.random() * endings.length)];
+      return o + " " + m + " " + e;
+    }
+
+    /* 사운드 */
+    function playCrackSound() {
+      const audio = document.getElementById("crackSound");
+      try {
+        audio.currentTime = 0;
+        audio.play();
+      } catch(e){}
+    }
+
+    /* 포춘쿠키 열기 */
+    function openCookie() {
+      const textEl = document.getElementById("fortuneText");
+      const coverEl = document.getElementById("fortuneCover");
+      const openBtn = document.getElementById("openBtn");
+      const shuffleBtn = document.getElementById("shuffleBtn");
+      const cookie = document.getElementById("cookieIcon");
+
+      textEl.textContent = getRandomFortune();
+      playCrackSound();
+
+      cookie.classList.remove("cookie-crack");
+      void cookie.offsetWidth;
+      cookie.classList.add("cookie-crack");
+
+      coverEl.classList.add("hide");
+      openBtn.disabled = true;
+      shuffleBtn.disabled = false;
+    }
+
+    /* 다시 뽑기 → 처음 상태로 되돌리기 */
+    function shuffleFortune() {
+      const textEl = document.getElementById("fortuneText");
+      const coverEl = document.getElementById("fortuneCover");
+      const openBtn = document.getElementById("openBtn");
+      const shuffleBtn = document.getElementById("shuffleBtn");
+      const cookie = document.getElementById("cookieIcon");
+
+      textEl.textContent = "";
+      cookie.classList.remove("cookie-crack");
+      coverEl.classList.remove("hide");
+
+      openBtn.disabled = false;
+      shuffleBtn.disabled = true;
+    }
+
+    setToday();
+  </script>
+</body>
+</html>
